@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: postgres_db
+    restart: always
+    environment:
+      - POSTGRES_USER=digi_visions
+      - POSTGRES_PASSWORD=digi_visions
+      - POSTGRES_DB=file_db
+    ports:
+      - '5432:5432'
+
+  app:
+    image: 'file-management:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: file_app
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/file_db
+      - SPRING_DATASOURCE_USERNAME=digi_visions
+      - SPRING_DATASOURCE_PASSWORD=digi_visions
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - '8080:8080'
